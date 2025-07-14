@@ -3,6 +3,14 @@
 
 name: CI Pipeline
 
+# Grant semantic-release permissions to push tags & commits and create releases
+permissions:
+  contents: write  # allow read/write repository contents (tags, commits)
+  issues: write   # allow creating issues (for fail plugin)
+  pull-requests: write
+  id-token: write
+
+
 on:
   push:
     branches:
@@ -32,6 +40,12 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
 
   release:
     name: Release (semantic-release)
