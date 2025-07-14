@@ -1,0 +1,39 @@
+{
+  "branches": [
+    { "name": "dev",      "prerelease": "beta" },
+    { "name": "release/*","prerelease": "rc"   },
+    { "name": "main" }
+  ],
+  "repositoryUrl": "https://github.com/Kerpackie/friendly-fishstick.git",
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/changelog",
+    [
+      "semantic-release-cargo",
+      {
+        "cargoManifestPath": "src-tauri/Cargo.toml",
+        "tagVersionPrefix": "v"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "CHANGELOG.md",
+          "package.json",
+          "src-tauri/Cargo.toml"
+        ],
+        "message": "chore(release): ${nextRelease.version} [skip ci]"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          "src-tauri/target/release/bundle/**/*"
+        ]
+      }
+    ]
+  ]
+}
