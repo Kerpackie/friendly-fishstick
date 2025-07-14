@@ -1,3 +1,10 @@
+## [1.3.9](https://github.com/Kerpackie/friendly-fishstick/compare/v1.3.8...v1.3.9) (2025-07-14)
+
+
+### Bug Fixes
+
+* Update build.yml ([df6a62f](https://github.com/Kerpackie/friendly-fishstick/commit/df6a62f345463db285ba8f3ae874a574dc583dec))
+
 ## [1.3.8](https://github.com/Kerpackie/friendly-fishstick/compare/v1.3.7...v1.3.8) (2025-07-14)
 
 
