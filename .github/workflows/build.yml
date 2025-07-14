@@ -67,6 +67,7 @@ jobs:
         if: ${{ ! contains(github.event.release.tag_name, '-beta') }}
         uses: ncipollo/release-action@v1
         with:
+          allowUpdates: true
           artifacts: src-tauri/target/release/bundle/*
           token:     ${{ secrets.RELEASE_TOKEN }}
           prerelease: ${{ github.event.release.prerelease }}
