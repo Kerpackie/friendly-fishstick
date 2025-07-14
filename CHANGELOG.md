@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/Kerpackie/friendly-fishstick/compare/v1.0.0...v1.0.1) (2025-07-14)
+
+
+### Bug Fixes
+
+* upload artifact ([dddba96](https://github.com/Kerpackie/friendly-fishstick/commit/dddba9694585f3f05514b060bfe867ab85a2a6ef))
+
 # 1.0.0 (2025-07-14)
 
 
