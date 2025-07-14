@@ -2,7 +2,7 @@
 name: Build & Publish Artifacts
 
 permissions:
-  contents: write    # allow uploading assets to the Release
+  contents: write    # to upload assets to the Release
 
 on:
   release:
@@ -31,8 +31,17 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
-      - name: Install pnpm
-        run: npm install -g pnpm@10
+      # ← install pnpm so the pnpm CLI is available
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      # debug to confirm pnpm is on PATH
+      - name: Debug pnpm
+        run: |
+          which pnpm
+          pnpm --version
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
@@ -43,6 +52,7 @@ jobs:
           toolchain: stable
           override: true
 
+      # Only build & upload on RC or stable (skip pure beta prereleases)
       - name: Build Tauri bundle
         if: ${{ ! contains(github.event.release.tag_name, '-beta') }}
         run: pnpm exec tauri build
