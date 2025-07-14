@@ -1,3 +1,4 @@
+# .github/workflows/build.yml
 name: Build & Publish Artifacts
 
 permissions:
@@ -19,8 +20,10 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
-      - uses: actions/checkout@v3
-        with: { fetch-depth: 0 }
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -28,8 +31,13 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
-      - name: Install pnpm
+      - name: Install pnpm v10
         run: npm install -g pnpm@10
+
+      - name: (Debug) Show pnpm path & version
+        run: |
+          which pnpm
+          pnpm --version
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
@@ -40,7 +48,6 @@ jobs:
           toolchain: stable
           override: true
 
-      # Only build & upload on RC or stable (skip pure beta prereleases)
       - name: Build Tauri bundle
         if: ${{ ! contains(github.event.release.tag_name, '-beta') }}
         run: pnpm exec tauri build
