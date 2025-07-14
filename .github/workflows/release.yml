@@ -23,11 +23,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with: { fetch-depth: 0 }
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with: { node-version: '20' }
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
 
       - name: Install pnpm
         run: npm install -g pnpm@10
@@ -42,11 +45,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with: { fetch-depth: 0 }
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with: { node-version: '20' }
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
 
       - name: Install pnpm
         run: npm install -g pnpm@10
@@ -63,5 +69,5 @@ jobs:
       - name: Semantic Release
         run: pnpm exec semantic-release
         env:
-          GH_TOKEN:      ${{ secrets.RELEASE_TOKEN }}
-          NPM_TOKEN:     ${{ secrets.NPM_TOKEN }}
+          GH_TOKEN:  ${{ secrets.RELEASE_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
