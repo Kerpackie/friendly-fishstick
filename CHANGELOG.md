@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/Kerpackie/friendly-fishstick/compare/v1.1.0...v1.2.0) (2025-07-14)
+
+
+### Features
+
+* fucking work please ([6ff9db4](https://github.com/Kerpackie/friendly-fishstick/commit/6ff9db4879fe2180471aa3c84545519dbe946a27))
+
 # [1.1.0](https://github.com/Kerpackie/friendly-fishstick/compare/v1.0.5...v1.1.0) (2025-07-14)
 
 
