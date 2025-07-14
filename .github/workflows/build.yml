@@ -4,28 +4,43 @@ permissions:
   contents: write    # to upload assets to the Release
 
 on:
+  # Manual trigger: supply the tag of the release you want to update
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Tag of the existing release to update (e.g. v1.2.0-rc.1)'
+        required: true
+      prerelease:
+        description: 'Is this a prerelease?'
+        required: true
+        default: 'true'
+        type: boolean
+
+  # Automatic on true releases—skip rc/beta
   release:
-    types:
-      - created
-      - prereleased
-      - published
+    types: [created, prereleased, published]
 
 jobs:
   build:
     name: Build & Upload Tauri Bundles
     runs-on: ${{ matrix.platform }}
+    # Only run on:
+    #   • workflow_dispatch (manual) OR
+    #   • release events whose tag doesn’t contain “rc” or “-beta”
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      ( github.event_name == 'release' &&
+        !contains(github.event.release.tag_name, 'rc') &&
+        !contains(github.event.release.tag_name, '-beta')
+      )
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest'      # Apple Silicon
-            args: '--target aarch64-apple-darwin'
-          - platform: 'macos-latest'      # Intel
-            args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-22.04'
-            args: ''
-          - platform: 'windows-latest'
-            args: ''
+          - platform: 'macos-latest'; args: '--target aarch64-apple-darwin'
+          - platform: 'macos-latest'; args: '--target x86_64-apple-darwin'
+          - platform: 'ubuntu-22.04';   args: ''
+          - platform: 'windows-latest';  args: ''
 
     steps:
       - name: Checkout code
@@ -44,17 +59,22 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
-      - name: Install frontend dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build frontend
-        run: pnpm build
+      - name: Install & build frontend
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
 
       - name: Setup Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
+
+      - name: Add macOS Rust targets
+        if: matrix.platform == 'macos-latest'
+        run: |
+          rustup target add aarch64-apple-darwin
+          rustup target add x86_64-apple-darwin
 
       - name: Install Linux system deps
         if: matrix.platform == 'ubuntu-22.04'
@@ -71,11 +91,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Use the existing tag/release info
-          tagName:     ${{ github.event.release.tag_name }}
-          releaseName: ${{ github.event.release.name }}
+          # Pick up the tag & prerelease flag from either the manual inputs or the release event
+          tagName:     ${{ github.event.inputs.release_tag || github.event.release.tag_name }}
+          releaseName: ${{ github.event.inputs.release_tag || github.event.release.name }}
           releaseBody: ${{ github.event.release.body }}
           releaseDraft: ${{ github.event.release.draft }}
-          prerelease:   ${{ github.event.release.prerelease }}
-          # Pass your build targets per‐matrix
+          prerelease:   ${{ github.event.inputs.prerelease || github.event.release.prerelease }}
           args:         ${{ matrix.args }}
