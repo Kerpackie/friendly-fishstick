@@ -1,12 +1,14 @@
-# .github/workflows/build.yml
 name: Build & Publish Artifacts
 
 permissions:
-  contents: write    # allow uploading assets to the Release
+  contents: write    # to upload assets to the Release
 
 on:
   release:
-    types: [published]
+    types:
+      - created       # when semantic-release first creates the Release object
+      - prereleased   # when it flags it as a prerelease (beta/rc)
+      - published     # when it marks a stable release “published”
 
 jobs:
   build:
@@ -38,13 +40,15 @@ jobs:
           toolchain: stable
           override: true
 
+      # Only build & upload on RC or stable (skip pure beta prereleases)
       - name: Build Tauri bundle
+        if: ${{ ! contains(github.event.release.tag_name, '-beta') }}
         run: pnpm exec tauri build
 
       - name: Upload Bundles to Release
+        if: ${{ ! contains(github.event.release.tag_name, '-beta') }}
         uses: ncipollo/release-action@v1
         with:
           artifacts: src-tauri/target/release/bundle/*
           token:     ${{ secrets.GITHUB_TOKEN }}
-          # This will mirror the prerelease flag from the GitHub Release itself
           prerelease: ${{ github.event.release.prerelease }}

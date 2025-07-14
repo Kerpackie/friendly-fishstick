@@ -1,9 +1,8 @@
-# .github/workflows/release.yml
 name: Release Pipeline
 
 permissions:
-  contents: write      # allow pushing tags & commits
-  issues:   write      # allow semantic-release to open an issue on failure
+  contents: write      # push tags & commits
+  issues:   write      # semantic-release “fail” plugin
   id-token: write
 
 on:
@@ -25,14 +24,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with: { fetch-depth: 0 }
-
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with: { node-version: '20' }
-
       - name: Install pnpm
         run: npm install -g pnpm@10
-
       - name: Install dependencies
         run: pnpm install
 
@@ -44,23 +40,18 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with: { fetch-depth: 0 }
-
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with: { node-version: '20' }
-
       - name: Install pnpm
         run: npm install -g pnpm@10
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
       - name: Setup Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
-
       - name: Semantic Release
         run: pnpm exec semantic-release
         env:
