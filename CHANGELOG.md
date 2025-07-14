@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/Kerpackie/friendly-fishstick/compare/v1.3.0...v1.3.1) (2025-07-14)
+
+
+### Bug Fixes
+
+* ci pnpm fix ([4f52ceb](https://github.com/Kerpackie/friendly-fishstick/commit/4f52cebd5f2c58f2fe920b33758b83525571bb6b))
+
 # [1.3.0](https://github.com/Kerpackie/friendly-fishstick/compare/v1.2.0...v1.3.0) (2025-07-14)
 
 
