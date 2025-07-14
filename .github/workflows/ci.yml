@@ -81,7 +81,6 @@ jobs:
   build:
     name: Build & Upload Artifacts
     needs: validate
-    # run on either a tag push or a release being published
     if: >
       (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
       (github.event_name == 'release' && github.event.action == 'published')
@@ -116,8 +115,9 @@ jobs:
         run: pnpm exec tauri build
 
       - name: Publish Release and Upload Artifacts
+        if: github.event_name == 'release'
         uses: ncipollo/release-action@v1
         with:
           artifacts: src-tauri/target/release/bundle/*
           token: ${{ secrets.GITHUB_TOKEN }}
-          prerelease: ${{ contains(github.ref_name, '-rc') }}
+          prerelease: ${{ github.event.release.prerelease }}
