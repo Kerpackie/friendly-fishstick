@@ -13,7 +13,8 @@
       "semantic-release-cargo",
       {
         "cargoManifestPath": "src-tauri/Cargo.toml",
-        "tagVersionPrefix": "v"
+        "tagVersionPrefix": "v",
+        "publish": false
       }
     ],
     [
