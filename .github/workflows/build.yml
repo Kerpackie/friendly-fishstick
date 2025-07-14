@@ -44,6 +44,12 @@ jobs:
           toolchain: stable
           override: true
 
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+
       - name: Build Tauri bundle
         if: ${{ ! contains(github.event.release.tag_name, '-beta') }}
         run: pnpm exec tauri build
