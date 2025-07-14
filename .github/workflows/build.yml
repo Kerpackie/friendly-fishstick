@@ -1,10 +1,10 @@
 name: Build & Publish Artifacts
 
 permissions:
-  contents: write    # to upload assets to the Release
+  contents: write    # to upload assets
 
 on:
-  # 1️⃣ Manual trigger: supply the tag of the release you want to update
+  # 1) Manual trigger: choose any tag (including RC/beta)
   workflow_dispatch:
     inputs:
       release_tag:
@@ -13,34 +13,39 @@ on:
       prerelease:
         description: 'Is this a prerelease?'
         required: true
-        default: 'true'
+        default: true
         type: boolean
 
-  # 2️⃣ Automatic on true releases—skip rc/beta
+  # 2) Auto on real releases—skip “rc”/“-beta” tags
   release:
-    types: [created, prereleased, published]
+    types:
+      - created
+      - prereleased
+      - published
 
 jobs:
   build:
     name: Build & Upload Tauri Bundles
     runs-on: ${{ matrix.platform }}
-    # Only run on:
-    #   • workflow_dispatch (manual) OR
-    #   • release events whose tag doesn’t contain “rc” or “-beta”
-    if: |
+    # Only run if manual, OR a non‐RC/beta release event
+    if: >
       github.event_name == 'workflow_dispatch' ||
-      ( github.event_name == 'release' &&
-        !contains(github.event.release.tag_name, 'rc') &&
-        !contains(github.event.release.tag_name, '-beta')
+      (github.event_name == 'release' &&
+       !contains(github.event.release.tag_name, 'rc') &&
+       !contains(github.event.release.tag_name, '-beta')
       )
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest'; args: '--target aarch64-apple-darwin'
-          - platform: 'macos-latest'; args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-22.04';   args: ''
-          - platform: 'windows-latest';  args: ''
+          - platform: macos-latest
+            args: --target aarch64-apple-darwin
+          - platform: macos-latest
+            args: --target x86_64-apple-darwin
+          - platform: ubuntu-22.04
+            args: ''
+          - platform: windows-latest
+            args: ''
 
     steps:
       - name: Checkout code
@@ -57,7 +62,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
+          cache: pnpm
 
       - name: Install & build frontend
         run: |
@@ -91,10 +96,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Pick up the tag & prerelease flag from either the manual inputs or the release event
-          tagName:     ${{ github.event.inputs.release_tag || github.event.release.tag_name }}
-          releaseName: ${{ github.event.inputs.release_tag || github.event.release.name }}
-          releaseBody: ${{ github.event.release.body }}
+          # Pick up manual inputs if provided, else fallback to the triggering release
+          tagName:     "${{ github.event.inputs.release_tag || github.event.release.tag_name }}"
+          releaseName: "${{ github.event.inputs.release_tag || github.event.release.name }}"
+          releaseBody: "${{ github.event.release.body || '' }}"
           releaseDraft: ${{ github.event.release.draft }}
           prerelease:   ${{ github.event.inputs.prerelease || github.event.release.prerelease }}
           args:         ${{ matrix.args }}
