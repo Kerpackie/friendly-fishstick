@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/Kerpackie/friendly-fishstick/compare/v1.0.5...v1.1.0) (2025-07-14)
+
+
+### Features
+
+* will we work this time? 2 stage pipeline baby! ([693845d](https://github.com/Kerpackie/friendly-fishstick/commit/693845dcd9665ba1d3191622bd675b4d84080629))
+
 ## [1.0.5](https://github.com/Kerpackie/friendly-fishstick/compare/v1.0.4...v1.0.5) (2025-07-14)
 
 
