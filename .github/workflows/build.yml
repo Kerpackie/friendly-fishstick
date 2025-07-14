@@ -4,7 +4,7 @@ permissions:
   contents: write    # to upload assets to the Release
 
 on:
-  # Manual trigger: supply the tag of the release you want to update
+  # 1️⃣ Manual trigger: supply the tag of the release you want to update
   workflow_dispatch:
     inputs:
       release_tag:
@@ -16,7 +16,7 @@ on:
         default: 'true'
         type: boolean
 
-  # Automatic on true releases—skip rc/beta
+  # 2️⃣ Automatic on true releases—skip rc/beta
   release:
     types: [created, prereleased, published]
 
