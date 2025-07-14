@@ -6,9 +6,9 @@ permissions:
 on:
   release:
     types:
-      - created       # when semantic-release first creates the Release object
-      - prereleased   # when it flags it as a prerelease (beta/rc)
-      - published     # when it marks a stable release “published”
+      - created
+      - prereleased
+      - published
 
 jobs:
   build:
@@ -50,5 +50,5 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: src-tauri/target/release/bundle/*
-          token:     ${{ secrets.GITHUB_TOKEN }}
+          token:     ${{ secrets.RELEASE_TOKEN }}
           prerelease: ${{ github.event.release.prerelease }}
