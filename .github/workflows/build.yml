@@ -1,0 +1,50 @@
+# .github/workflows/build.yml
+name: Build & Publish Artifacts
+
+permissions:
+  contents: write    # allow uploading assets to the Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build & Upload Tauri Bundles
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v3
+        with: { fetch-depth: 0 }
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: npm install -g pnpm@10
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Build Tauri bundle
+        run: pnpm exec tauri build
+
+      - name: Upload Bundles to Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: src-tauri/target/release/bundle/*
+          token:     ${{ secrets.GITHUB_TOKEN }}
+          # This will mirror the prerelease flag from the GitHub Release itself
+          prerelease: ${{ github.event.release.prerelease }}

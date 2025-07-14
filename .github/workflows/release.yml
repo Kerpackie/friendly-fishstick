@@ -1,0 +1,68 @@
+# .github/workflows/release.yml
+name: Release Pipeline
+
+permissions:
+  contents: write      # allow pushing tags & commits
+  issues:   write      # allow semantic-release to open an issue on failure
+  id-token: write
+
+on:
+  push:
+    branches:
+      - dev
+      - 'release/*'
+      - main
+  pull_request:
+    branches:
+      - dev
+      - 'release/*'
+      - main
+
+jobs:
+  validate:
+    name: Validate (lint & test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with: { fetch-depth: 0 }
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with: { node-version: '20' }
+
+      - name: Install pnpm
+        run: npm install -g pnpm@10
+
+      - name: Install dependencies
+        run: pnpm install
+
+  semantic-release:
+    name: Release (semantic-release)
+    needs: validate
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with: { fetch-depth: 0 }
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with: { node-version: '20' }
+
+      - name: Install pnpm
+        run: npm install -g pnpm@10
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Semantic Release
+        run: pnpm exec semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN:    ${{ secrets.NPM_TOKEN }}
