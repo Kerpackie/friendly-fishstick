@@ -18,18 +18,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest'      # For ARM-based Macs (M1 and above)
+          - platform: 'macos-latest'      # Apple Silicon
             args: '--target aarch64-apple-darwin'
-          - platform: 'macos-latest'      # For Intel-based Macs
+          - platform: 'macos-latest'      # Intel
             args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-latest'
+          - platform: 'ubuntu-22.04'
             args: ''
           - platform: 'windows-latest'
             args: ''
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -47,14 +47,17 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build frontend
+        run: pnpm build
+
       - name: Setup Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
 
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-latest'
+      - name: Install Linux system deps
+        if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -63,22 +66,16 @@ jobs:
             librsvg2-dev \
             patchelf
 
-      - name: Build Tauri bundle
-        if: ${{ ! contains(github.event.release.tag_name, '-beta') }}
-        run: pnpm exec tauri build
-
-      - name: Upload Bundles to Release
-        if: ${{ ! contains(github.event.release.tag_name, '-beta') }}
-        uses: ncipollo/release-action@v1
+      - name: Build & Release with Tauri Action
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          allowUpdates: true
-          artifacts: |
-            src-tauri/target/release/bundle/**/*.dmg
-            src-tauri/target/release/bundle/**/*.zip
-            src-tauri/target/release/bundle/**/*.tar.gz
-            src-tauri/target/release/bundle/**/*.AppImage
-            src-tauri/target/release/bundle/**/*.msi
-            src-tauri/target/release/bundle/**/*.deb
-            src-tauri/target/release/bundle/**/*.rpm
-          token:     ${{ secrets.RELEASE_TOKEN }}
-          prerelease: ${{ github.event.release.prerelease }}
+          # Use the existing tag/release info
+          tagName:     ${{ github.event.release.tag_name }}
+          releaseName: ${{ github.event.release.name }}
+          releaseBody: ${{ github.event.release.body }}
+          releaseDraft: ${{ github.event.release.draft }}
+          prerelease:   ${{ github.event.release.prerelease }}
+          # Pass your build targets per‐matrix
+          args:         ${{ matrix.args }}
