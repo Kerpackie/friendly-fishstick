@@ -1,9 +1,9 @@
+# .github/workflows/ci.yml
 name: CI Pipeline
 
-# Grant semantic-release permission to push tags/commits and create releases
 permissions:
-  contents: write      # for tags & commits
-  issues: write        # for the fail plugin
+  contents: write      # allow pushing tags & commits, uploading release assets
+  issues: write        # allow semantic-release to open failure issues
   pull-requests: write
   id-token: write
 
@@ -11,12 +11,14 @@ on:
   push:
     branches:
       - '**'
+    tags:
+      - 'v*.*.*'       # 🔥 trigger on semantic-release tag pushes
   pull_request:
     branches:
       - '**'
   release:
     types:
-      - published    # 2️⃣ only run build after a Release is published
+      - published      # 🔥 trigger on GitHub Release publishes
 
 jobs:
   validate:
@@ -24,13 +26,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+        with: { fetch-depth: 0 }
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
-        with:
-          node-version: '20'
+        with: { node-version: '20' }
 
       - name: Install pnpm
         run: npm install -g pnpm@10
@@ -41,22 +41,20 @@ jobs:
   release:
     name: Release (semantic-release)
     needs: validate
-    if: |
+    if: >
       github.event_name == 'push' && (
-        github.ref == 'refs/heads/dev' ||
+        github.ref == 'refs/heads/dev'      ||
         startsWith(github.ref, 'refs/heads/release/') ||
         github.ref == 'refs/heads/main'
       )
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+        with: { fetch-depth: 0 }
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
-        with:
-          node-version: '20'
+        with: { node-version: '20' }
 
       - name: Install pnpm
         run: npm install -g pnpm@10
@@ -78,24 +76,24 @@ jobs:
 
   build:
     name: Build & Upload Artifacts
-    needs: release
+    needs: validate
+    if: >
+      # on a new tag pushed by semantic-release…
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
+      # …or on the GitHub Release publish event
+      (github.event_name == 'release' && github.event.action == 'published')
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
 
-    # only after a GitHub “release.published” event
-    if: github.event_name == 'release' && github.event.action == 'published'
-
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+        with: { fetch-depth: 0 }
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
-        with:
-          node-version: '20'
+        with: { node-version: '20' }
 
       - name: Install pnpm
         run: npm install -g pnpm@10
