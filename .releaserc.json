@@ -10,11 +10,9 @@
     "@semantic-release/release-notes-generator",
     "@semantic-release/changelog",
     [
-      "semantic-release-cargo",
+      "@semantic-release/exec",
       {
-        "cargoManifestPath": "src-tauri/Cargo.toml",
-        "tagVersionPrefix": "v",
-        "publish": false
+        "prepareCmd": "cargo install cargo-edit && cargo set-version ${nextRelease.version} --manifest-path src-tauri/Cargo.toml"
       }
     ],
     [

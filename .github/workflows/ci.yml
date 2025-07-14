@@ -1,15 +1,11 @@
-# GitHub Actions CI for Tauri + pnpm + semantic-release
-# Validates on every push/PR; releases on dev/release/*/main; builds on tag; publishes artifacts.
-
 name: CI Pipeline
 
-# Grant semantic-release permissions to push tags & commits and create releases
+# Grant semantic-release permission to push tags/commits and create releases
 permissions:
-  contents: write  # allow read/write repository contents (tags, commits)
-  issues: write   # allow creating issues (for fail plugin)
+  contents: write      # for tags & commits
+  issues: write        # for the fail plugin
   pull-requests: write
   id-token: write
-
 
 on:
   push:
@@ -33,7 +29,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: '20'
 
       - name: Install pnpm
         run: npm install -g pnpm@10
@@ -59,7 +55,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: '20'
 
       - name: Install pnpm
         run: npm install -g pnpm@10
@@ -67,11 +63,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Setup Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
       - name: Semantic Release
         run: pnpm exec semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN:    ${{ secrets.NPM_TOKEN }}
 
   build:
     name: Build Artifacts
@@ -89,7 +91,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: '20'
 
       - name: Install pnpm
         run: npm install -g pnpm@10
