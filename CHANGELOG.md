@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/Kerpackie/friendly-fishstick/compare/v1.0.2...v1.0.3) (2025-07-14)
+
+
+### Bug Fixes
+
+* ci hopefully ([cec57f5](https://github.com/Kerpackie/friendly-fishstick/commit/cec57f54ba02d651f3768990ec078a88317e49e7))
+
 ## [1.0.2](https://github.com/Kerpackie/friendly-fishstick/compare/v1.0.1...v1.0.2) (2025-07-14)
 
 
