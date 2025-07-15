@@ -1,3 +1,11 @@
+# [1.6.0-rc.1](https://github.com/Kerpackie/friendly-fishstick/compare/v1.5.1...v1.6.0-rc.1) (2025-07-15)
+
+
+### Features
+
+* beta test ([0950a72](https://github.com/Kerpackie/friendly-fishstick/commit/0950a72e8f842fe4c6fa87ed51580ca8e2728c8a))
+* rc test ([bb78356](https://github.com/Kerpackie/friendly-fishstick/commit/bb7835663ebeb1b9306efb5beb1a9a18c8c10237))
+
 ## [1.5.1](https://github.com/Kerpackie/friendly-fishstick/compare/v1.5.0...v1.5.1) (2025-07-14)
 
 
